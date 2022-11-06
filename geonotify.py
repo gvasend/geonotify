@@ -25,19 +25,20 @@ env = None  # This will be set to the simulation environment
 notify_lst = ['uav','manned ac']  # Specify what types of tracks will be reported
 tracks = {}
 notification_zones = {}
-def create_notification_zone(ID, start_time=0, end_time=3600.0, center=(0,0), radius=0):
+def create_notification_zone(ID, start_time=0, end_time=3600.0, center=(0,0), radius=0, notify='alert'):
     try:
-        notification_zones[ID] = {'ID':ID, 'start_time': start_time, 'end_time': end_time, 'center': center, 'radius':radius, 'status':'created','inside':[]}
-        pub.sendMessage('alert',message='Created notification zone: %s' %ID)
+        notification_zones[ID] = {'ID':ID, 'start_time': start_time, 'end_time': end_time, 'center': center, 'radius':radius, 'status':'created', 'notify':notify,'inside':[]}
+        alert_message('Created notification zone: %s' %ID, zone=ID)
     except:
-        pub.sendMessage('alert',message='exception occurred attempting to create notification zone: %s' %ID)
+        alert_message('exception occurred attempting to create notification zone: %s' %ID, notify=notify)
         
 def delete_notification_zone(ID):
     try:
+        notify = notification_zones[ID]['notify']
         del notification_zones[ID]
-        pub.sendMessage('alert','Deleted notification zone: %s' %ID)
+        alert_message('Deleted notification zone: %s' %ID, notify=notify)
     except:
-        pub.sendMessage('alert',message='attempt to delete a non-existant notification zone: %s' %ID)
+        alert_message('attempt to delete a non-existant notification zone: %s' %ID, notify='alert')
         
 def geonotify_svc(ID='', ac_class='unknown', latitude=0.0, longitude=0.0, agl_altitude=0.0, velocity=0.0, control_lat=0.0, control_lon=0.0, control_alt=0.0, time_mark=0, emergency_status='normal_flight'):
     global tracks
@@ -45,9 +46,6 @@ def geonotify_svc(ID='', ac_class='unknown', latitude=0.0, longitude=0.0, agl_al
 #    print('received track update for ',ID)
     check_zones_track_intrusion(ID)
 
-def receive_alert_svc(message=''):
-    print('Alert received>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',message,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    
 # Service support functions
 
 # Check all active zones against a single track
@@ -77,15 +75,23 @@ def check_zone_track_intrusion(zone, track):
             alert(zone, track,'departed')
             
 # Simple alert message
-def alert_message(msg):
-    pub.sendMessage('alert', message=msg)
+def alert_message(msg,zone=None,notify=None):
+    # msg - message to send
+    # zone - get endpoint topic from zone
+    # notify - if present, explicitly specifies topic
+    if notify:
+        pub.sendMessage(notify, message=msg)
+    elif zone:
+        pub.sendMessage(notification_zones[zone]['notify'], message=msg)            # send alert to user specified topic
+    else:       # use the default topic
+        pub.sendMessage('alert', message=msg)
 
 # Alert message customized to report zone and track
 def alert(zone, track, msg):
     track_dct = get_track(track)
     zone_dct = get_zone(zone)
     ac_class = track_dct['ac_class']
-    pub.sendMessage('alert.%s' % (zone_dct['ID']), message='A %s (%s) has %s notification zone: %s' %(ac_class,track,msg,zone_dct['ID']))
+    alert_message('A %s (%s) has %s notification zone: %s' %(ac_class,track,msg,zone_dct['ID']), zone)
 
 # return the dict related to zone
 def get_zone(zone):
@@ -148,7 +154,7 @@ def latlon_distance(Pt1, Pt2):
 # The V0 geonotification service supports the following messages:
 
 pub.subscribe(geonotify_svc, 'adsb')                        # Receive track information
-pub.subscribe(receive_alert_svc, 'alert')                   # Generate an alert message to the user
+
 pub.subscribe(delete_notification_zone, 'delete_zone')      # Allow a user to delete a zone
 pub.subscribe(create_notification_zone, 'create_zone')      # Allow a user to create a zone
 

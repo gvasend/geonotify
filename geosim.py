@@ -164,7 +164,7 @@ def execute_scenario(filename):
     uav_dct = load_uav_data(scenario_dct['uav_data_file'])
     print('scenario:',scenario_dct)
     for nz in scenario_dct['notification_zones']:
-        pub.sendMessage('create_zone', ID=nz['ID'], start_time=nz['start_time'], end_time=nz['end_time'], center=(nz['center_lat'],nz['center_lon']), radius=nz['radius'])
+        pub.sendMessage('create_zone', ID=nz['ID'], start_time=nz['start_time'], end_time=nz['end_time'], center=(nz['center_lat'],nz['center_lon']), radius=nz['radius'], notify=nz['notify_endpoint'])
     adsb_lat = scenario_dct['adsb_lat']
     adsb_lon = scenario_dct['adsb_lon']
     adsb_radius = scenario_dct['adsb_radius']
@@ -203,7 +203,24 @@ def get_adsb(adsb_lat,adsb_lon,adsb_radius):
     #        print('adsb track', track)
             pub.sendMessage('adsb', ID=ID, ac_class='manned ac', latitude=track['lat'], longitude=track['lon'], agl_altitude=alt, velocity=(true_heading,gs,track['rc']))
         yield env.timeout(ADSB_POLL_INTERVAL)
+        
+# Simulated alert receivers
+
+def receive_alert_svc(message=''):
+    print('General alert received>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',message,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     
+def gv_receive_alert_svc(message=''):
+    print('gvasend alert received>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',message,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    
+def js_receive_alert_svc(message=''):
+    print('jsmith alert received>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>',message,'<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    
+pub.subscribe(receive_alert_svc, 'alert')                   # Generate an alert message to the user
+pub.subscribe(gv_receive_alert_svc, 'alert.gvasend')                   # Generate an alert message to the user
+pub.subscribe(js_receive_alert_svc, 'alert.jsmith')                   # Generate an alert message to the user
+
+
+
 execute_scenario('test_scenario.json')
 
     
