@@ -1,0 +1,5 @@
+{
+  "mini2": {"endurance":30.0,"max_speed": 40.0},
+  "mavic_pro": {"endurance":30.0,"max_speed":50.0},
+  "phantom": {"endurance":20.0,"max_speed":20.0}
+}

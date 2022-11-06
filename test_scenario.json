@@ -1,0 +1,24 @@
+{
+  "scenario_name": "test",
+  "track_period": 30.0,
+  "lower_left_lat": 32.45,
+  "lower_left_lon": -80.25,
+  "upper_right_lat": 33.25,
+  "upper_right_lon": -79.75,
+  "loc_std_dev": 0.5,
+  "start_number_uav": 50,
+  "average_uav_arrival_time": 5.0,
+  "max_service_load": 100,
+  "scenario_duration": 3600.0,
+  "sim_speed": 1.0,
+  "adsb_lat":32.8943,
+  "adsb_lon":-80.0382,
+  "adsb_radius":50,
+  "uav_data_file":"uav_data.json",
+  "adsb_key":"842b5e8e74msh1e41f7e801f62b5p18acabjsn7bdb826c6e9a",
+  "notification_zones": [
+  { "ID":"MyZone1", "start_time":45.0, "end_time":300.0, "center_lat":32.8943, "center_lon":-80.0382, "radius":25.0 }, 
+    { "ID":"MyZone2", "start_time":210.0, "end_time":3600.0, "center_lat":32.8943, "center_lon":-80.0382, "radius":30.0 },
+    { "ID":"MyZone3", "start_time":60.0, "end_time":240.0, "center_lat":32.878170, "center_lon":-79.755740, "radius":10.0 }
+  ]
+}
