@@ -20,7 +20,7 @@ Future considerations:
 """
 
 from pubsub import pub
-import simpy, json, time, random, math, geopy.distance
+import simpy, json, time, random, math, geopy.distance, sys
 from datetime import datetime
 import geonotify
 
@@ -31,6 +31,13 @@ UAV_UPDATE_INTERVAL = 30.0 # rate at which simulated uav tracks are updated
 SIM_PACE_DELAY = 0.1    # SIM_PACE_DELAY allows the simulation to idle while synchronizing between simulated and real-time.
                         # Need to experiment with different values to see what provides best performance.
 
+# Look for the scenario file on the command line
+if len(sys.argv) > 1:
+    scenario_file = sys.argv[1]
+else:
+    scenario_file = 'test_scenario.json'
+    
+print('Scenario file:',scenario_file)
 
 
 class Aircraft():
@@ -221,6 +228,6 @@ pub.subscribe(js_receive_alert_svc, 'alert.jsmith')                   # Generate
 
 
 
-execute_scenario('test_scenario.json')
+execute_scenario(scenario_file)
 
     
