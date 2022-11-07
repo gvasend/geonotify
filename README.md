@@ -15,3 +15,8 @@ Future considerations:
 - Consider what fidelity of dead reckoning is required by the service (e.g. wind). 
 - Consider other notification zone shapes. Currently it is represented as a sphere.
 - Drone operations could vary significantly from a focused objective to eratic operation. Machine Learning might be used to predict such behavior.
+
+Steps to run:
+1) Clone repo
+2) Install libraries from requirements.txt
+3) Run: python geosim.py test_scenario.json
